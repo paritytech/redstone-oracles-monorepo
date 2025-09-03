@@ -12,6 +12,8 @@
     "lint": "yarn global:eslint .",
     "lint:fix": "yarn global:eslint --fix .",
     "test": "hardhat test",
+    "test:polkadot": "./run-tests.sh",
+    "test:no-polkadot": "ENABLE_POLKADOT=false hardhat test",
     "w3f-run": "yarn build && hardhat w3f-run redstone --debug --logs",
     "w3f-deploy": "yarn build && hardhat w3f-deploy redstone | tee /dev/tty | ts-node save-deploy-cid.ts"
   },
@@ -29,6 +31,8 @@
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
     "@openzeppelin/contracts": "^4.8.1",
+    "@parity/hardhat-polkadot": "^0.1.11-pre1",
+    "@parity/hardhat-polkadot-node": "^0.1.6-pre1",
     "@redstone-finance/protocol": "workspace:*",
     "@redstone-finance/rpc-providers": "workspace:*",
     "@tsconfig/recommended": "1.0.2",

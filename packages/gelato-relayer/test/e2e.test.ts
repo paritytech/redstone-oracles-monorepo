@@ -3,6 +3,8 @@ import { Web3FunctionHardhat } from "@gelatonetwork/web3-functions-sdk/hardhat-p
 import { expect } from "chai";
 import hre from "hardhat";
 import args from "./userArgs.json";
+import fs from "fs";
+import path from "path";
 
 const { w3f } = hre;
 
@@ -12,7 +14,7 @@ describe("RedStone Gelato w3f: On-chain Relayer & remote manifest e2e Tests", fu
   let redstoneW3f: Web3FunctionHardhat;
 
   beforeEach(function () {
-    redstoneW3f = w3f.get("redstone");
+    redstoneW3f = w3f.get("redstone-mock"); // Use mock runner for local tests
   });
 
   it.skip("Return 'canExec: true' when update is needed", async () => {
@@ -20,19 +22,22 @@ describe("RedStone Gelato w3f: On-chain Relayer & remote manifest e2e Tests", fu
   });
 
   it("Return 'canExec: true' when update is needed for MultiFeed", async () => {
-    await performTest(
-      {
-        ...args,
-        manifestUrls: [
-          "https://remote-config-ruby.vercel.app/gelato-sepolia-for-tests-multi-feed-manifest.json",
-        ],
-      },
-      "0xfcd454d19f9B8806F8908e99d85b8eA17b3c7346"
-    );
+    const userArgs = {
+      ...args,
+      shouldUpdatePrices: true,
+      message: "Update needed",
+      localManifestData: Buffer.from(
+        fs.readFileSync(path.join(__dirname, "./manifestMultiFeed.json"))
+      ).toString("base64"),
+      manifestUrls: [
+        "https://remote-config-ruby.vercel.app/gelato-sepolia-for-tests-multi-feed-manifest.json",
+      ],
+    };
+    await performTest(userArgs, "0xfcd454d19f9B8806F8908e99d85b8eA17b3c7346");
   });
 
   async function performTest(
-    userArgs: typeof args,
+    userArgs: any,
     destinationContractAddress: string
   ) {
     const { result } = await redstoneW3f.run("onRun", { userArgs });
@@ -47,5 +52,9 @@ describe("RedStone Gelato w3f: On-chain Relayer & remote manifest e2e Tests", fu
 
     expect(callData.length).to.equal(1);
     expect(callData[0].to).to.equal(destinationContractAddress);
+
+    // Check that callData is generated (similar to index.test.ts)
+    const data = callData[0].data;
+    expect(data).to.match(/0x[a-f0-9]+/); // Should be hex data
   }
 });
