@@ -70,7 +70,7 @@
     "mocha": "^10.2.0",
     "prompts": "^2.4.2",
     "redstone-api": "^0.4.13",
-    "toml": "^3.0.0",
+    "toml": "^5.0.1",
     "ts-mocha": "^10.0.0"
   },
   "files": [
